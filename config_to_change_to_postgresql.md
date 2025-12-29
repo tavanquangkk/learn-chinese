@@ -1,10 +1,10 @@
-# Hướng dẫn chuyển đổi Database sang PostgreSQL (Secure Mode)
+# PostgreSQLへのデータベース移行ガイド (セキュア設定)
 
-Hệ thống đã được cấu hình để sử dụng **Biến môi trường (Environment Variables)**. Bạn không cần sửa code để đổi database nữa.
+システムは **環境変数 (Environment Variables)** を使用するように構成されています。データベースを切り替える際にコードを修正する必要はありません。
 
-## 1. Cập nhật `backend/pom.xml`
+## 1. `backend/pom.xml` の更新
 
-Thêm driver PostgreSQL (nếu chưa có):
+PostgreSQL ドライバを追加します（まだの場合）:
 
 ```xml
 <dependency>
@@ -14,39 +14,41 @@ Thêm driver PostgreSQL (nếu chưa có):
 </dependency>
 ```
 
-## 2. Cách chạy với PostgreSQL
+## 2. PostgreSQL での実行方法
 
-Thay vì sửa file `application.properties`, bạn chỉ cần thiết lập các biến môi trường sau khi chạy ứng dụng.
+`application.properties` を直接修正する代わりに, アプリケーション起動時に環境変数を設定します。
 
-### Cách 1: Chạy bằng dòng lệnh (Terminal/Bash)
+### 方法 1: ターミナルから実行 (Bash/Zsh)
 
 ```bash
-# 1. Export các biến môi trường
+# 1. 環境変数をエクスポート
 export DB_URL=jdbc:postgresql://localhost:5432/learnchinesedb
 export DB_USERNAME=postgres
 export DB_PASSWORD=your_secure_password
 export DB_DRIVER=org.postgresql.Driver
 export DB_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
 export GEMINI_API_KEY=your_gemini_key
+export APP_PROFILE=prod
 
-# 2. Chạy ứng dụng
+# 2. 実行
 cd backend
 mvn spring-boot:run
 ```
 
-### Cách 2: Chạy bằng IntelliJ IDEA / Eclipse
+### 方法 2: IntelliJ IDEA / Eclipse での実行
 
-1.  Mở cấu hình **Run/Debug Configurations**.
-2.  Tìm mục **Environment variables**.
-3.  Thêm chuỗi sau vào:
+1.  **Run/Debug Configurations** を開きます。
+2.  **Environment variables** 項目を探します。
+3.  以下の文字列を追加します:
     ```text
-    DB_URL=jdbc:postgresql://localhost:5432/learnchinesedb;DB_USERNAME=postgres;DB_PASSWORD=123456;DB_DRIVER=org.postgresql.Driver;DB_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+    APP_PROFILE=prod;DB_URL=jdbc:postgresql://localhost:5432/learnchinesedb;DB_USERNAME=postgres;DB_PASSWORD=password;DB_DRIVER=org.postgresql.Driver;DB_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
     ```
 
-### Cách 3: Chạy bằng Docker (Production)
+### 方法 3: Docker での実行 (本番環境)
 
 ```bash
 docker run -d \
+  -e APP_PROFILE=prod \
   -e DB_URL=jdbc:postgresql://db-host:5432/learnchinesedb \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=secret \
@@ -56,10 +58,11 @@ docker run -d \
   my-learn-chinese-app
 ```
 
-## 3. Giá trị mặc định (Fallback)
+## 3. デフォルト値 (Fallback)
 
-Nếu bạn **KHÔNG** thiết lập các biến trên, ứng dụng sẽ tự động quay về sử dụng **H2 Database (File)** như cũ để phục vụ việc phát triển local:
+環境変数を設定 **しない** 場合, アプリケーションは自動的に **H2 データベース (ファイル)** を使用します（ローカル開発用）:
 
 *   **URL**: `jdbc:h2:file:./data/learnchinesedb`
 *   **User**: `sa`
-*   **Pass**: (rỗng)
+*   **Pass**: (空)
+*   **Profile**: `dev`

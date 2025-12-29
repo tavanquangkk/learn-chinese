@@ -16,29 +16,29 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
   final ScrollController _scrollController = ScrollController();
   final FlutterTts flutterTts = FlutterTts();
   
-  // Data State
-  List<dynamic> fullVocabularyList = []; 
-  List<dynamic> displayedVocabulary = []; 
+  // データ状態
+  List<dynamic> fullVocabularyList = []; // 現在のレベルの全単語リスト
+  List<dynamic> displayedVocabulary = []; // 表示中のリスト (パートごとに分割)
   bool isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   final ApiService _apiService = ApiService();
 
-  // Pagination Config
-  final int _itemsPerPart = 50; 
-  int _currentPartIndex = 0; 
+  // ページネーション設定
+  final int _itemsPerPart = 50; // 1パートあたりの単語数
+  int _currentPartIndex = 0; // 現在のパート (0 = Part 1)
 
-  // TTS State
+  // TTS (音声合成) 状態
   List<Map<String, String>> _availableChineseVoices = [];
   Map<String, String>? _currentVoice;
 
   @override
   void initState() {
     super.initState();
-    _initTts();
+    _initTts(); // TTSの初期化
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
         if (_tabController.indexIsChanging) {
-             _currentPartIndex = 0;
+             _currentPartIndex = 0; // HSKレベル変更時にパートをリセット
              _fetchVocabulary();
         }
     });
@@ -46,19 +46,18 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
     _searchController.addListener(_onSearchChanged);
   }
   
+  // TTSの初期化と音声リストの取得
   Future<void> _initTts() async {
     await flutterTts.setLanguage("zh-CN");
     await flutterTts.setSpeechRate(0.5);
     await flutterTts.setVolume(1.0);
     await flutterTts.setPitch(1.0);
 
-    // Lấy danh sách giọng
     try {
         await Future.delayed(const Duration(milliseconds: 500));
         dynamic voices = await flutterTts.getVoices;
         
         List<Map<String, String>> tempVoices = [];
-        
         if (voices is List) {
             for (var voice in voices) {
                 String voiceStr = voice.toString(); 
@@ -76,6 +75,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
         });
 
         if (_availableChineseVoices.isNotEmpty) {
+            // Googleの音声を優先的に選択
             var googleVoice = _availableChineseVoices.firstWhere(
                 (v) => v['name']!.contains('Google'), 
                 orElse: () => _availableChineseVoices.first
@@ -83,7 +83,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
             _setVoice(googleVoice);
         }
     } catch (e) {
-        print("❌ Lỗi lấy danh sách giọng: $e");
+        print("❌ 音声リストの取得失敗: $e");
     }
   }
 
@@ -92,7 +92,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
           _currentVoice = voice;
       });
       await flutterTts.setVoice(voice);
-      print("Đã chọn giọng: ${voice['name']}");
   }
 
   Future<void> _speak(String text) async {
@@ -102,7 +101,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
     await flutterTts.speak(text);
   }
 
-  // Hiển thị Popup chọn giọng
+  // 音声設定ポップアップの表示
   void _showVoiceSettings() {
       showModalBottomSheet(
           context: context, 
@@ -113,13 +112,13 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                          const Text("Chọn giọng đọc", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text("音声の選択", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 10),
-                          const Text("Lưu ý: Danh sách này phụ thuộc vào trình duyệt của bạn.", style: TextStyle(color: Colors.grey)),
+                          const Text("注意: 表示されるリストはブラウザに依存します。", style: TextStyle(color: Colors.grey)),
                           const Divider(),
                           Expanded(
                               child: _availableChineseVoices.isEmpty 
-                                ? const Center(child: Text("Không tìm thấy giọng tiếng Trung nào."))
+                                ? const Center(child: Text("中国語の音声が見つかりません。"))
                                 : ListView.builder(
                                     itemCount: _availableChineseVoices.length,
                                     itemBuilder: (context, index) {
@@ -134,7 +133,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
                                             trailing: isSelected ? const Icon(Icons.check, color: Colors.green) : null,
                                             onTap: () {
                                                 _setVoice(voice);
-                                                _speak("你好"); // Đọc thử
+                                                _speak("你好"); // テスト発音
                                                 Navigator.pop(context);
                                             },
                                         );
@@ -169,6 +168,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
     }
   }
 
+  // 検索クエリ変更時の処理: 全リストから検索しページネーションを一時無効化
   void _onSearchChanged() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -186,6 +186,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
     });
   }
 
+  // 現在のパートに基づいて表示リストを更新
   void _updateDisplayedListByPart() {
     int start = _currentPartIndex * _itemsPerPart;
     int end = start + _itemsPerPart;
@@ -205,6 +206,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
     _scrollToTop();
   }
   
+  // ソート処理: 未習得を上へ, 習得済みを下へ
   void _sortList(List<dynamic> list) {
       list.sort((a, b) {
           bool rememberA = a['remembered'] ?? false;
@@ -214,6 +216,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
       });
   }
 
+  // APIから単語データを取得
   Future<void> _fetchVocabulary() async {
     setState(() => isLoading = true);
     try {
@@ -233,6 +236,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
     }
   }
   
+  // 習得状態の切り替え
   Future<void> _toggleRemember(String id) async {
       final index = displayedVocabulary.indexWhere((item) => item['id'] == id);
       if (index != -1) {
@@ -254,12 +258,12 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Từ vựng Tiếng Trung'),
+        title: const Text('中国語単語学習'),
         backgroundColor: Colors.deepOrange.shade50,
         actions: [
             IconButton(
                 icon: const Icon(Icons.settings_voice),
-                tooltip: "Chọn giọng đọc",
+                tooltip: "音声設定",
                 onPressed: _showVoiceSettings,
             )
         ],
@@ -282,7 +286,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Tìm kiếm...',
+                  hintText: '検索 (単語, ピンイン, 意味)...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   filled: true,
@@ -292,6 +296,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
               ),
             ),
             
+            // パート選択 (検索中でない場合のみ表示)
             if (!isSearching && totalParts > 1)
               Container(
                 height: 50,
@@ -325,7 +330,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
-                    'Hiển thị ${_currentPartIndex * _itemsPerPart + 1} - ${(_currentPartIndex + 1) * _itemsPerPart > fullVocabularyList.length ? fullVocabularyList.length : (_currentPartIndex + 1) * _itemsPerPart} / ${fullVocabularyList.length} từ',
+                    '表示中: ${_currentPartIndex * _itemsPerPart + 1} - ${(_currentPartIndex + 1) * _itemsPerPart > fullVocabularyList.length ? fullVocabularyList.length : (_currentPartIndex + 1) * _itemsPerPart} / ${fullVocabularyList.length} 語',
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                   ),
                 ),
@@ -358,7 +363,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> with SingleTickerPr
                                 IconButton(
                                   icon: Icon(Icons.volume_up, color: isRemembered ? Colors.grey : Colors.blue),
                                   onPressed: () => _speak(item['simplified']),
-                                  tooltip: 'Nghe phát âm',
+                                  tooltip: '発音を聞く',
                                 ),
                                 Switch(
                                     value: isRemembered,
