@@ -1,0 +1,11 @@
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/DataInitializer.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/LearnChineseApplication.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/controller/ChatbotController.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/controller/PronunciationController.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/controller/VocabularyController.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/dto/GeminiRequest.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/dto/GeminiResponse.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/model/Vocabulary.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/repository/VocabularyRepository.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/service/CsvImportService.java
+/Users/tavanquang/Desktop/LEARN_SOMETHING/learn-chinese/backend/src/main/java/com/learnchinese/backend/service/GeminiService.java

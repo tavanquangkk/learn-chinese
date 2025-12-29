@@ -1,0 +1,17 @@
+com/learnchinese/backend/DataInitializer.class
+com/learnchinese/backend/dto/GeminiResponse$Candidate.class
+com/learnchinese/backend/service/GeminiService.class
+com/learnchinese/backend/dto/GeminiRequest$Part.class
+com/learnchinese/backend/dto/GeminiResponse.class
+com/learnchinese/backend/model/Vocabulary.class
+com/learnchinese/backend/dto/GeminiRequest$Content.class
+com/learnchinese/backend/dto/GeminiResponse$Part.class
+com/learnchinese/backend/repository/VocabularyRepository.class
+com/learnchinese/backend/service/CsvImportService.class
+com/learnchinese/backend/LearnChineseApplication.class
+com/learnchinese/backend/LearnChineseApplication$1.class
+com/learnchinese/backend/dto/GeminiResponse$Content.class
+com/learnchinese/backend/controller/PronunciationController.class
+com/learnchinese/backend/controller/VocabularyController.class
+com/learnchinese/backend/dto/GeminiRequest.class
+com/learnchinese/backend/controller/ChatbotController.class
