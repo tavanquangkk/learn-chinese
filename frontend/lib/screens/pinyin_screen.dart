@@ -2,14 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/pinyin_provider.dart';
 
+// this feature will be create latter
 class PinyinScreen extends ConsumerWidget {
   final List<String> pinyinList = [
-    'ba', 'pa', 'ma', 'fa',
-    'da', 'ta', 'na', 'la',
-    'ga', 'ka', 'ha',
-    'ji', 'qi', 'xi',
-    'zhi', 'chi', 'shi', 'ri',
-    'zi', 'ci', 'si',
+    'ba',
+    'pa',
+    'ma',
+    'fa',
+    'da',
+    'ta',
+    'na',
+    'la',
+    'ga',
+    'ka',
+    'ha',
+    'ji',
+    'qi',
+    'xi',
+    'zhi',
+    'chi',
+    'shi',
+    'ri',
+    'zi',
+    'ci',
+    'si',
   ];
 
   PinyinScreen({super.key});
@@ -52,7 +68,7 @@ class PinyinScreen extends ConsumerWidget {
 
 class ToneDialog extends ConsumerWidget {
   final String pinyin;
-  
+
   const ToneDialog({super.key, required this.pinyin});
 
   @override
@@ -77,15 +93,16 @@ class ToneDialog extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             explanationState.when(
-              data: (data) => data.isNotEmpty 
+              data: (data) => data.isNotEmpty
                   ? Container(
                       padding: const EdgeInsets.all(10),
                       color: Colors.blue.shade50,
                       child: Text(data, style: const TextStyle(fontSize: 16)),
-                    ) 
+                    )
                   : const SizedBox.shrink(),
               loading: () => const CircularProgressIndicator(),
-              error: (err, stack) => Text('Lỗi: $err', style: const TextStyle(color: Colors.red)),
+              error: (err, stack) =>
+                  Text('Lỗi: $err', style: const TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -110,7 +127,7 @@ class ToneDialog extends ConsumerWidget {
       ),
       onPressed: () {
         // Play sound (TODO)
-        ref.read(pinyinExplanationProvider.notifier).getExplanation(pinyin, tone);
+        // ref.read(pinyinExplanationProvider.notifier).getExplanation(pinyin, tone);
       },
       child: Text(
         symbol,

@@ -3,7 +3,10 @@ import '../services/api_service.dart';
 
 final apiServiceProvider = Provider((ref) => ApiService());
 
-final pinyinExplanationProvider = AsyncNotifierProvider<PinyinExplanationNotifier, String>(PinyinExplanationNotifier.new);
+final pinyinExplanationProvider =
+    AsyncNotifierProvider<PinyinExplanationNotifier, String>(
+      PinyinExplanationNotifier.new,
+    );
 
 class PinyinExplanationNotifier extends AsyncNotifier<String> {
   @override
@@ -11,12 +14,14 @@ class PinyinExplanationNotifier extends AsyncNotifier<String> {
     return '';
   }
 
-  Future<void> getExplanation(String pinyin, String tone) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => ref.read(apiServiceProvider).explainPronunciation(pinyin, tone));
-  }
-  
+  // Future<void> getExplanation(String pinyin, String tone) async {
+  //   state = const AsyncValue.loading();
+  //   state = await AsyncValue.guard(
+  //     () => ref.read(apiServiceProvider).explainPronunciation(pinyin, tone),
+  //   );
+  // }
+
   void clear() {
-      state = const AsyncValue.data('');
+    state = const AsyncValue.data('');
   }
 }
